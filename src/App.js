@@ -1,52 +1,32 @@
-  
-import React from "react";
-import {
-  Formik,
-  Field,
-  Form,
-  useField,
-  FieldAttributes,
-  FieldArray
-} from "formik";
-import {
-  TextField,
-  Button,
-  Checkbox,
-  Radio,
-  FormControlLabel,
-  Select,
-  MenuItem
-} from "@material-ui/core";
+import React from 'react';
+import { Formik, Field, Form, useField, FieldArray } from 'formik';
+import { TextField, Button, Checkbox, Radio, FormControlLabel, Select, MenuItem } from "@material-ui/core"
+import './App.css';
 import * as yup from "yup";
 
-type MyRadioProps = { label: string } & FieldAttributes<{}>;
-
-const MyRadio: React.FC<MyRadioProps> = ({ label, ...props }) => {
-  const [field] = useField<{}>(props);
+function MyRadio({ label, ...props }) {
+  const [field] = useField(props);
   return <FormControlLabel {...field} control={<Radio />} label={label} />;
 };
 
-const MyTextField: React.FC<FieldAttributes<{}>> = ({
-  placeholder,
-  ...props
-}) => {
-  const [field, meta] = useField<{}>(props);
-  const errorText = meta.error && meta.touched ? meta.error : "";
+function MyTextField({placeholder, ...props}) {
+  const [field, meta] = useField(props);
+  const textErro = meta.error && meta.touched ? meta.error : "";
   return (
-    <TextField
+    <TextField 
       placeholder={placeholder}
-      {...field}
-      helperText={errorText}
-      error={!!errorText}
+      {...field} 
+      helperText={textErro}
+      error={!!textErro}
     />
   );
 };
 
-const validationSchema = yup.object({
-  firstName: yup
+const validaDados = yup.object({
+  Nome: yup
     .string()
     .required()
-    .max(10),
+    .max(15),
   pets: yup.array().of(
     yup.object({
       name: yup.string().required()
@@ -54,120 +34,87 @@ const validationSchema = yup.object({
   )
 });
 
-const App: React.FC = () => {
+function App() {
   return (
-    <div>
-      <Formik
-        validateOnChange={true}
-        initialValues={{
-          firstName: "",
-          lastName: "",
-          isTall: false,
-          cookies: [],
-          yogurt: "",
-          pets: [{ type: "cat", name: "jarvis", id: "" + Math.random() }]
-        }}
-        validationSchema={validationSchema}
-        // validate={values => {
-        //   const errors: Record<string, string> = {};
+    <div alignItens="center">
+    <Formik 
+    validateOnChange={true}
+      initialValues={{ 
+        Nome: '', 
+        Sobrenome: '', 
+        isActivated: false, 
+        cookies: [], 
+        yogurt: '',
+        pets: [{type: 'cachorro', name: 'chico', id: '' + Math.random() }] 
+      }} 
+      validaDados={validaDados}
+      onSubmit={( data, { setSubmitting }) => {
+        setSubmitting(true);
+        console.log('submit: ', data);
+        setSubmitting(false);
+      }}
+    >
 
-        //   if (values.firstName.includes("bob")) {
-        //     errors.firstName = "no bob";
-        //   }
-
-        //   return errors;
-        // }}
-        onSubmit={(data, { setSubmitting }) => {
-          setSubmitting(true);
-          // make async call
-          console.log("submit: ", data);
-          setSubmitting(false);
-        }}
-      >
-        {({ values, errors, isSubmitting }) => (
-          <Form>
-            <MyTextField placeholder="first name" name="firstName" />
-            <div>
-              <Field
-                placeholder="last name"
-                name="lastName"
-                type="input"
-                as={TextField}
-              />
-            </div>
-            <Field name="isTall" type="checkbox" as={Checkbox} />
-            <div>cookies:</div>
-            <Field
-              name="cookies"
-              type="checkbox"
-              value="chocolate chip"
-              as={Checkbox}
-            />
-            <Field
-              name="cookies"
-              type="checkbox"
-              value="snickerdoodle"
-              as={Checkbox}
-            />
-            <Field name="cookies" type="checkbox" value="sugar" as={Checkbox} />
-            <div>yogurt</div>
-            <MyRadio name="yogurt" type="radio" value="peach" label="peach" />
-            <MyRadio
-              name="yogurt"
-              type="radio"
-              value="blueberry"
-              label="blueberry"
-            />
-            <MyRadio name="yogurt" type="radio" value="apple" label="apple" />
-            <FieldArray name="pets">
-              {arrayHelpers => (
-                <div>
-                  <Button
-                    onClick={() =>
-                      arrayHelpers.push({
-                        type: "frog",
-                        name: "",
-                        id: "" + Math.random()
-                      })
-                    }
-                  >
-                    add pet
-                  </Button>
-                  {values.pets.map((pet, index) => {
-                    return (
-                      <div key={pet.id}>
-                        <MyTextField
-                          placeholder="pet name"
-                          name={`pets.${index}.name`}
-                        />
-                        <Field
-                          name={`pets.${index}.type`}
-                          type="select"
-                          as={Select}
-                        >
-                          <MenuItem value="cat">cat</MenuItem>
-                          <MenuItem value="dog">dog</MenuItem>
-                          <MenuItem value="frog">frog</MenuItem>
-                        </Field>
-                        <Button onClick={() => arrayHelpers.remove(index)}>
-                          x
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </FieldArray>
-            <div>
-              <Button disabled={isSubmitting} type="submit">
-                submit
+      {({ values, erros, isSubmitting }) => (
+        <Form>
+          <Field placeholder="Nome" name="Nome" />
+          <div>
+            <Field placeholder="Sobrenome" name="Sobrenome" type="input" as={TextField} />
+          </div>
+          <Field name="isActivated" type="checkbox" as={Checkbox} />
+          <div>cookies:</div>
+          <Field name="cookies" type="checkbox" value="gotas de chocolate" as={Checkbox} />
+          <Field name="cookies" type="checkbox" value="frutas vermelhas" as={Checkbox} />
+          <Field name="cookies" type="checkbox" value="nutella" as={Checkbox} />
+          
+          <div>yogurt: </div>
+          <MyRadio name="yogurt" type="radio" value="soja" label="soja" />
+          <MyRadio name="yogurt" type="radio" value="maçã" label="maçã" />
+          <MyRadio name="yogurt" type="radio" value="blueberry" label="blueberry" />
+          
+          <FieldArray name="pets">
+            {arrayHelpers => (
+              <div>
+                <Button onClick={() => 
+                  arrayHelpers.push({
+                    type: '🐻', 
+                    name: '',
+                    id: '' + Math.random()
+                  })
+                }
+              >
+                add pet
               </Button>
-            </div>
-            <pre>{JSON.stringify(values, null, 2)}</pre>
-            <pre>{JSON.stringify(errors, null, 2)}</pre>
-          </Form>
-        )}
-      </Formik>
+              {values.pets.map((pet, index) => {
+                return (
+                  <div key={pet.id}>
+                    <MyTextField placeholder="Nome do Pet" name={`pets.${index}.name`} />
+                    <Field name={`pets.${index}.type`} type="select" as={Select}>
+                      <MenuItem value="lobo">Lobo</MenuItem>
+                      <MenuItem value="urso">Urso</MenuItem>
+                      <MenuItem value="tigre">Tigre</MenuItem>
+                    </Field>
+                    <Button onClick={() => arrayHelpers.remove(index)}>
+                      x
+                    </Button>
+                  </div>
+                );
+              })}
+              </div>
+            )}
+          </FieldArray>
+
+          <div>
+            <Button disabled={isSubmitting} type="submit">
+              Enviar
+            </Button>
+          </div>
+
+          <pre>{JSON.stringify(values, null, 2)}</pre>
+          <pre>{JSON.stringify(erros, null, 2)}</pre>
+        </Form>
+      )}
+    </Formik>
     </div>
   );
 };
